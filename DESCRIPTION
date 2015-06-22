@@ -1,0 +1,10 @@
+Package: TLBC
+Type: Package
+Title: Two-level Behavior Classification
+Version: 1.0
+Date: 2015-05-29
+Author: Kat Ellis
+Maintainer: Kat Ellis <kellis@ucsd.edu>
+Description: A package for behavior classification from accelerometer and GPS data. Includes functions for learning a two-level model, applying the model to data, and computing performance.
+Depends:stringr,randomForest,HMM,tools,signal,caret
+License: GPL-2
