@@ -21,6 +21,9 @@ trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE,
   labels = train[[1]]$behavior
   trainDat = trainDat[labels!="NULL", ]
   labels = labels[labels!="NULL"]
+  
+  cat("using labels: ", unique(labels), "\n")
+  
   if (!is.null(nsample)){
     nsample = min(nrow(trainDat), nsample)
   } else { nsample = nrow(trainDat) }
