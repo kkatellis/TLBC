@@ -6,6 +6,13 @@ Download and unzip the folder. Install the package by running the following comm
 ```
 install.packages("path/to/TLBC", type="source", repos=NULL)
 ```
+
+Load the package by running the following command in R:
+
+```
+library(TLBC)
+```
+
 ## Formatting the data
 
 Each participant should have a unique participant identifier which will be used to match data between devices (if applicable). You should have a separate directory containing data from each device, and a separate direcory for any annotation files.
