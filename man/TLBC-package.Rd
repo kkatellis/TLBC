@@ -14,6 +14,10 @@ Function \code{\link{classify}} uses a pre-learned TLBC model to classify accele
 
 Function \code{\link{trainModel}} trains a TLBC model from annotated accelerometer and/or GPS data.
 
+Function \code{\link{calcPerformance}} computes the accuracy of predictions made on a given dataset.
+
+Function \code{\link{looXval}} performs leave-one-out cross-validation on a dataset.
+
 }
 \details{
 \tabular{ll}{
@@ -38,28 +42,20 @@ Kat Ellis <kellis@ucsd.edu>
 %~~ simple examples of the most important functions ~~
 \dontrun{
 
-# accelerometer data directory
-accDir = "~/rawAccelerometerData"
-
-# GPS data file
-GPSFile = "~/PALMSProcessedGPSData.csv"
-
-# classify using a model included in the package
-classify(accelerometers=accDir, GPS=GPSFile, modelName="CyclistHipGPS", saveDir="~/CyclistHipGPSPredictions")
-
-# annDir = "~/Annotations"
+# classify using a pre-trained model included in the package
+classify(accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", modelName="CommuterCyclistsHipGT3X+GPS", saveDir="~/myStudy/CyclistHipGPSPredictions")
 
 # train a new model
-trainModel(annotations=annDir, accelerometers=accDir, GPS=GPSFile, winSize=60, modelName="~/myModel.RData")
+trainModel(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", winSize=60, modelName="~/myStudy/myModel.RData")
 
 # classify using a model computed yourself
-classify(accelerometers=accDir, GPS=GPSFile, modelName="~/myModel.RData", saveDir="~/myModelPredictions")
+classify(accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", modelName="~/myStudy/myModel.RData", saveDir="~/myStudy/myModelPredictions")
 
-# ccompute the performance of a model on a dataset
-calcPerformance(annotations=annDir, predictions="~/myModelPredictions", winSize=60)
+# compute the performance of a model on a dataset
+calcPerformance(annotations="~/myStudy/HipGT3X+", predictions="~/myStudy/myModelPredictions", winSize=60)
 
 # perform leave-one-out cross-validation on a dataset
-looXval(annotations=annDir, accelerometers=AccDir, winSize=60, saveDir="~/looXvalAccOnly")
+looXval(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", winSize=60, saveDir="~/myStudy/looXvalPredictions")
 
 }
 

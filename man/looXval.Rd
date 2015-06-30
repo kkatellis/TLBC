@@ -48,7 +48,13 @@ Kat Ellis
 \seealso{
 \code{\link{trainModel}},\code{\link{classify}}
 }
-%\examples{}
+\examples{
+\dontrun{
+
+# perform leave-one-out cross-validation on a dataset
+looXval(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", winSize=60, saveDir="~/myStudy/looXvalPredictions")
+}
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

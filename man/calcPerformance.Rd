@@ -41,7 +41,13 @@ Kat Ellis
 \seealso{
 \code{\link{confusionMatrix}}
 }
-%%\examples{}
+\examples{
+\dontrun{
+
+# compute the performance of a model on a dataset
+calcPerformance(annotations="~/myStudy/HipGT3X+", predictions="~/myStudy/myModelPredictions", winSize=60)
+}
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

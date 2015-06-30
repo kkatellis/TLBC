@@ -67,7 +67,12 @@ Kat Ellis
 \seealso{
 \code{\link{randomForest}}, \code{\link{looXval}}
 }
-%\examples{}
+\examples{
+\dontrun{
+
+trainModel(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", winSize=60, modelName="~/myStudy/myModel.RData")
+}
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }
