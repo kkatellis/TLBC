@@ -2,6 +2,9 @@
 
 loadModel = function(modelName, which) {
   # function to load a model
+  hmm = NULL
+  rf = NULL
+  winSize = NULL
   
   if (typeof(modelName) == "list") {
     return(modelName)
@@ -11,7 +14,7 @@ loadModel = function(modelName, which) {
     load(modelName)
   } else {
     # otherwise look in package data
-    data(list=modelName, package="classifyBehaviors")
+    data(list=modelName, package="classifyBehaviors", envir = environment())
   }
   if (which=="winSize") {
     return(winSize)
@@ -70,7 +73,7 @@ loadData = function(labelDir, featDirs, names=NULL) {
   }
   return(list(all_labels, all_data))
 }
-loadFeatures = function(featDirs,names=NULL) {
+loadFeatures = function(featDirs, names=NULL) {
   # function to load features from directories
   if (is.null(names)) {
     names = list.files(featDirs[1])

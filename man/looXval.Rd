@@ -1,5 +1,6 @@
 \name{looXval}
 \alias{looXval}
+\alias{looXvalFromFeats}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Function to perform leave-one-out cross-validation
@@ -8,7 +9,8 @@ Function to perform leave-one-out cross-validation
 Performs leave-one-out cross-validation
 }
 \usage{
-looXval(annotations, accelerometers = NULL, GPS = NULL, winSize = 60, saveDir, names = NULL, strat = TRUE)
+looXval(annotations, accelerometers=NULL, GPS=NULL, winSize=60, saveDir, names=NULL, 
+strat=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,7 +42,7 @@ Path to a directory where predictions will be saved. Predictions will be saved i
 logical: use stratified sampling for the random forest?
 }
 }\author{
-Kat Ellis
+Katherine Ellis
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -52,7 +54,11 @@ Kat Ellis
 \dontrun{
 
 # perform leave-one-out cross-validation on a dataset
-looXval(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", winSize=60, saveDir="~/myStudy/looXvalPredictions")
+myAnnotations="~/myStudy/annotations.csv"
+myAccel="~/myStudy/HipGT3X+"
+winSize=60
+myPredictions="~/myStudy/looXvalPredictions"
+looXval(annotations=myAnnotations, accelerometers=myAccel, winSize=WS, saveDir=myPredictions)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

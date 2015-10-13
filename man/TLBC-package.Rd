@@ -10,7 +10,17 @@ TLBC is a package for using a two-level random forest and hidden Markov model fo
 
 This code works with csv data from Actigraph accelerometers (please export without timestamps), and with GPS data processed by the PALMS GPS cleaning software. 
 
-Function \code{\link{classify}} uses a pre-learned TLBC model to classify accelerometer and/or GPS data with behavior labels. 
+The TLBC classifier uses six behavior labels:
+\itemize{
+\item{Sitting}
+\item{Standing Still}
+\item{Standing Moving}
+\item{Walking/Running}
+\item{Bicycling}
+\item{Vehicle}
+}
+
+Function \code{\link{classify}} uses a pre-learned TLBC model to classify accelerometer and/or GPS data with behavior labels. Pre-trained models that have been trained on three UCSD datasets are \href{http://ieng9.ucsd.edu/~kellis/TLBC.html}{available for download}.
 
 Function \code{\link{trainModel}} trains a TLBC model from annotated accelerometer and/or GPS data.
 
@@ -30,7 +40,7 @@ License: \tab GPL-2\cr
 %~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
-Kat Ellis <kellis@ucsd.edu>
+Katherine Ellis <kellis@ucsd.edu>
 }
 %\references{}
 \keyword{ package }
@@ -42,20 +52,34 @@ Kat Ellis <kellis@ucsd.edu>
 %~~ simple examples of the most important functions ~~
 \dontrun{
 
-# classify using a pre-trained model included in the package
-classify(accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", modelName="CommuterCyclistsHipGT3X+GPS", saveDir="~/myStudy/CyclistHipGPSPredictions")
-
 # train a new model
-trainModel(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", winSize=60, modelName="~/myStudy/myModel.RData")
+myAnnotations="~/myStudy/annotations.csv"
+myAccel="~/myStudy/HipGT3X+"
+myGPS="~/myStudy/GPS.csv"
+WS=60
+myModel="~/myStudy/myModel.RData"
+trainModel(annotations=myAnnotations, accelerometers=myAccel, GPS=myGPS, winSize=WS, 
+modelName=myModel)
 
 # classify using a model computed yourself
-classify(accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", modelName="~/myStudy/myModel.RData", saveDir="~/myStudy/myModelPredictions")
+myAccel="~/myStudy/HipGT3X+"
+myGPS="~/myStudy/GPS.csv"
+myModel="~/myStudy/myModel.RData"
+myPredictions="~/myStudy/myModelPredictions"
+classify(accelerometers=myAccel, GPS=myGPS, modelName=myModel, saveDir=myPredictions)
 
 # compute the performance of a model on a dataset
-calcPerformance(annotations="~/myStudy/HipGT3X+", predictions="~/myStudy/myModelPredictions", winSize=60)
+myAnnotations="~/myStudy/annotations.csv"
+myPredictions="~/myStudy/myModelPredictions"
+WS=60
+calcPerformance(annotations=myAnnotations, predictions=myPredictions, winSize=WS)
 
 # perform leave-one-out cross-validation on a dataset
-looXval(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", winSize=60, saveDir="~/myStudy/looXvalPredictions")
+myAnnotations="~/myStudy/annotations.csv"
+myAccel="~/myStudy/HipGT3X+"
+WS=60
+myPredictions="~/myStudy/looXvalPredictions"
+looXval(annotations=myAnnotations, accelerometers=myAccel, winSize=WS, saveDir=myPredictions)
 
 }
 

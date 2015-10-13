@@ -28,20 +28,3 @@ calcPerformanceFromLabels = function(labelDir, predDir, names=NULL,
     return(NULL)
   }
 }
-calcPerformanceFromTable = function(tbl, combineStanding=FALSE) {
-  if (nrow(tbl) == 0) {
-    return(NULL)
-  }
-  tbl = tbl[tbl$behavior != "NULL",]
-  if (combineStanding) {
-    tbl$pr[grepl("Standing", pr)] = "Standing"
-    tbl$gt[grepl("Standing", gt)] = "Standing"
-  }
-  l = unique(c(tbl$behavior, tbl$prediction))
-  pr = factor(tbl$prediction, levels=l)
-  gt = factor(tbl$behavior, levels=l)
-  m = confusionMatrix(pr, gt)
-  print(m)
-  cat("\n")
-  return(m)
-}

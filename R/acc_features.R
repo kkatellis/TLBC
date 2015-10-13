@@ -109,7 +109,7 @@ computeOneAccFeat = function(w, Fs) {
   
   return(c(fMean, fStd, fCoefVariation, fMedian, fMin, fMax, f25thP, f75thP, fAutocorr, fCorrxy, fCorrxz, fCorryz, fAvgRoll, fAvgPitch, fAvgYaw, fSdRoll, fSdPitch, fSdYaw, fRollG, fPitchG, fYawG, fFmax, fPmax, fFmaxBand, fPmaxBand, fEntropy, FFT0, FFT1, FFT2, FFT3, FFT4, FFT5, FFT6, FFT7, FFT8, FFT9, FFT10, FFT11, FFT12, FFT13, FFT14))
 }
-extractAccFeatsFile = function(inputFile, outputFile, winSize) {
+extractAccFeatsFile = function(inputFile, outputPath, winSize) {
   # function to extract accelerometer features from raw actigraph file
   
   con = file(inputFile, open = "r")
@@ -127,10 +127,10 @@ extractAccFeatsFile = function(inputFile, outputFile, winSize) {
   line = readLines(con, n = 6)
   st = strptime(paste(StartDate, StartTime), paste(dateFmt, "%H:%M:%S"))
   day = st$mday
-  out = file.path(outputFile,strftime(st, "%Y-%m-%d"))
+  out = file.path(outputPath,strftime(st, "%Y-%m-%d"))
   cat(strftime(st, "%Y-%m-%d"), '\n')
-  if (!file.exists(outputFile)) {
-    dir.create(outputFile, recursive=TRUE)
+  if (!file.exists(outputPath)) {
+    dir.create(outputPath, recursive=TRUE)
   }
   cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
   
@@ -147,7 +147,7 @@ extractAccFeatsFile = function(inputFile, outputFile, winSize) {
     
     st = as.POSIXlt(st + winSize)
     if (st$mday != day) {
-      out = file.path(outputFile,strftime(st, "%Y-%m-%d"))
+      out = file.path(outputPath,strftime(st, "%Y-%m-%d"))
       cat(strftime(st, "%Y-%m-%d"), '\n')
       cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
       day = st$mday

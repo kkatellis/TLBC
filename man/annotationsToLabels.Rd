@@ -13,13 +13,13 @@ annotationsToLabels(annotations, winSize, names = NULL)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{annotations}{
-Path to file containing bout-level annotations, or directory of file containing bout-level annotations. Should be csv format with fields: \emph{identifier,StartDateTime,EndDateTime,behavior}.
+Path to file containing bout-level annotations, or directory of files containing bout-level annotations. Should be csv format with fields: \emph{identifier, StartDateTime, EndDateTime, behavior}.
 }
   \item{winSize}{
 Window size in seconds.
 }
   \item{names}{
-(Optional) Identifier names to include.
+(Optional) If provided, extract annotations only for identifiers in this list.
 }
 }
 %%\details{}
@@ -27,7 +27,7 @@ Window size in seconds.
 Path to directory where instance-level label files are saved.
 }
 \author{
-Kat Ellis
+Katherine Ellis
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

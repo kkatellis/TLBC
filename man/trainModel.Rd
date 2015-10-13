@@ -1,5 +1,6 @@
 \name{trainModel}
 \alias{trainModel}
+\alias{trainFromFeatures}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Function to train a two-level model from accelerometer and/or GPS data
@@ -8,7 +9,8 @@ Function to train a two-level model from accelerometer and/or GPS data
 Trains a two-level model from accelerometer and/or GPS data.
 }
 \usage{
-trainModel(annotations, accelerometers = NULL, GPS = NULL, winSize = 60, modelName, names = NULL, strat = TRUE, ntree = 500, mtry = NULL, replace = TRUE, nsample = 10000, nodesize = 1, sampsize = 10000)
+trainModel(annotations, accelerometers=NULL, GPS=NULL, winSize=60, modelName, names=NULL, 
+strat=TRUE, ntree=500, mtry=NULL, replace=TRUE, nsample=10000, nodesize=1, sampsize=10000)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,7 +30,7 @@ Or, path to a directory (or list of directories) containing previously computed 
 Or, path to a directory containing previously computed GPS features, \emph{i.e.}, computed by the function \emph{sensorsToFeatures}.
 }
   \item{winSize}{
-%%     ~~Describe \code{winSize} here~~
+Window size in seconds.
 }
   \item{modelName}{
 Path to location to save model.
@@ -37,40 +39,45 @@ Path to location to save model.
 (Optional) List of participant identifiers to use.
 }
   \item{strat}{
-logical: use stratified sampling for the random forest?
+(Optional) logical: use stratified sampling for the random forest?
 }
   \item{ntree}{
-Number of trees in the random forest
+(Optional) Number of trees in the random forest
 }
   \item{mtry}{
-Number of variables randomly sampled as candidates at each split in the random forest.
+(Optional) Number of variables randomly sampled as candidates at each split in the random forest.
 }
   \item{replace}{
-Should sampling in the random forest be done with or without replacement?
+(Optional) Should sampling in the random forest be done with or without replacement?
 }
   \item{nsample}{
-Number of instances to sample.
+(Optional) Number of instances to sample.
 }
   \item{nodesize}{
-Minimum size of terminal nodes in the random forest.
+(Optional) Minimum size of terminal nodes in the random forest.
 }
   \item{sampsize}{
-Size of sample to draw for the random forest.
+(Optional) Size of sample to draw for the random forest.
 }
 }
 \author{
-Kat Ellis
+Katherine Ellis
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{randomForest}}, \code{\link{looXval}}
+\code{\link{classify}}, \code{\link{looXval}}
 }
 \examples{
 \dontrun{
-
-trainModel(annotations="~/myStudy/annotations.csv", accelerometers="~/myStudy/HipGT3X+", GPS="~/myStudy/GPS.csv", winSize=60, modelName="~/myStudy/myModel.RData")
+myAnotations="~/myStudy/annotations.csv"
+myAccel="~/myStudy/HipGT3X+"
+myGPS="~/myStudy/GPS.csv"
+winSize=60
+myModel="~/myStudy/myModel.RData"
+trainModel(annotations=myAnotations, accelerometers=myAccel, GPS=myGPS, winSize=WS, 
+modelName=myModel)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

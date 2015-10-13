@@ -47,7 +47,7 @@ extractLabelsSingleFile = function(inputFile, outputDir, winSize) {
   actNames = sub(" ", "", annotations)
   identifiers = unique(all_bouts$identifier)
   for (id in 1:length(identifiers)) {
-    cat(ids[i], "\n")
+    cat(identifiers[id], "\n")
     
     bouts = all_bouts[all_bouts$identifier == identifiers[id], ]
     outputFile = file.path(outputDir, identifiers[id])

@@ -104,7 +104,26 @@ looXvalFromFeats = function(labelDir, featDirs, saveDir, names=NULL, strat=TRUE)
     cat("test subject:", names[i], "\n")
     testNames = names[i]
     trainNames = names[-i]
-    trainTest(trainLabelDir=labelDir, trainFeatDirs=featDirs, trainNames=trainNames, testNames=testNames, saveDir1=saveDir1, saveDir2=saveDir, strat=strat)
+
+    # do two-level classification
+    modelName1 = "temp.rf"
+    modelName2 = "temp.hmm"
+    
+    # first train RF
+    rf = trainRF(labelDir, featDirs, trainNames, strat=strat)
+    testRF(featDirs, rf, saveDir1, testNames)
+    # calculate performance
+    cat(testNames, "\n")
+    calcPerformance(featDirs, saveDir1, testNames)
+    
+    # then apply HMM smoothing to RF outputs
+    hmm = trainHMM(labelDir, rf, trainNames)
+    testHMM(saveDir1, hmm, saveDir, testNames)
+    # calculate performance
+    cat(testNames,"\n")
+    calcPerformance(labelDir, saveDir, testNames)
+    file.remove(modelName1)
+    file.remove(modelName2)
     cat("----------------------------------\n")
   }
   cat("Overall RF\n")
@@ -129,8 +148,7 @@ trainFromFeatures = function(labelDir, featDirs, modelName, winSize, names=NULL,
   save(rf, hmm, winSize, file=modelName)
   cat("model saved to", modelName, "\n")
 }
-testAllDir = function(featDirs, modelName, saveDir, names=NULL, 
-                      singlePlaceActivity=FALSE, singlePlaceDir=NULL) {
+testAllDir = function(featDirs, modelName, saveDir, names=NULL) {
   if (is.null(names)) {
     names = list.files(featDirs[1])
   }
@@ -138,41 +156,6 @@ testAllDir = function(featDirs, modelName, saveDir, names=NULL,
   for (i in 1:length(names)) {
     testRF(featDirs, modelName, saveDir1, names[i])
     testHMM(saveDir1, modelName, saveDir, names[i])
-    if (singlePlaceActivity){
-      testStat(singlePlaceDir, featDirs, names[i])
-    }
   }
   cat("predictions saved to", saveDir, "\n")
-  #unlink(saveDir1, recursive=TRUE)
-}
-
-trainTest = function(trainLabelDir, testLabelDir=NULL, trainFeatDirs, 
-                     testFeatDirs=NULL, trainNames, testNames, saveDir1, 
-                     saveDir2, strat=TRUE) {
-  # do two-level classification
-  modelName1 = "temp.rf"
-  modelName2 = "temp.hmm"
-  
-  if (is.null(testLabelDir)) {
-    testLabelDir = trainLabelDir
-  }
-  if (is.null(testFeatDirs)) {
-    testFeatDirs = trainFeatDirs
-  }
-  
-  # first train RF
-  rf = trainRF(trainLabelDir, trainFeatDirs, trainNames, strat=strat)
-  testRF(testFeatDirs, rf, saveDir1, testNames)
-  # calculate performance
-  cat(testNames, "\n")
-  calcPerformance(testLabelDir, saveDir1, testNames)
-  
-  # then apply HMM smoothing to RF outputs
-  hmm = trainHMM(trainLabelDir, rf, trainNames)
-  testHMM(saveDir1, hmm, saveDir2, testNames)
-  # calculate performance
-  cat(testNames,"\n")
-  calcPerformance(testLabelDir, saveDir2, testNames)
-  file.remove(modelName1)
-  file.remove(modelName2)
 }
