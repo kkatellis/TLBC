@@ -1,8 +1,12 @@
-# TLBC: Two-level behavior classification R package
+# TLBC: Two-Level behavior classification R package
 
 ## About
 
-TLBC is an R package for classifying human behaviors from accelerometer and/or GPS data using a two-level behavior classifier (TLBC). The package has been developed for Actigraph accelerometers placed on either the hip or wrist. The TLBC classifier uses five behavior labels:
+Two-Level behavior classification (TLBC) is an R package for classifying human behaviors from accelerometer and/or GPS data. The package contains functions for training and applying two-level random forest and hidden Markov models.
+
+The package has been developed for csv data from Actigraph accelerometers (please export in RAW format, without timestamps), and/or GPS data processed by the PALMS GPS cleaning software.
+
+The TLBC classifier uses five behavior labels:
 
 * Sitting
 * Standing Still

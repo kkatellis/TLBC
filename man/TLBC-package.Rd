@@ -3,12 +3,12 @@
 \alias{TLBC}
 \docType{package}
 \title{
-Two-level Behavior Classification
+Two-Level Behavior Classification
 }
 \description{
-TLBC is a package for using a two-level random forest and hidden Markov model for behavior classification from raw tri-axial accelerometer and/or GPS data.
+Contains functions for training and applying two-level random forest and hidden Markov models for human behavior classification from raw tri-axial accelerometer and/or GPS data.
 
-This code works with csv data from Actigraph accelerometers (please export without timestamps), and with GPS data processed by the PALMS GPS cleaning software. 
+This code works with csv data from Actigraph accelerometers (please export in RAW format, without timestamps), and/or with GPS data processed by the PALMS GPS cleaning software. 
 
 The TLBC classifier uses six behavior labels:
 \itemize{
