@@ -12,16 +12,28 @@ computeOneAccFeat = function(w, Fs) {
 #     g = 0.9 * g + 0.1 * w[n, ]
 #   }
   
-  g = matrix(0, nrow(w), 3)
-  x = 0.9
-  g[1, ] = (1-x) * w[1, ]
-  for (n in 2:nrow(w)) {
-    g[n, ] = x * g[n-1] + (1-x) * w[n, ]
-  }
-  g = g[Fs:nrow(g), ] # ignore beggining
-  gg = colMeans(g)
-  w = w - gg
+#   g = matrix(0, nrow(w), 3)
+#   alpha = 0.06
+#   deltaT = 1/30
+#   fc = alpha/((1 - alpha) * 2 * pi * deltaT) # cutoff frequency
+#   g[1, ] = (1-x) * w[1, ]
+#   for (n in 2:nrow(w)) {
+#     g[n, ] = alpha * w[n, ] + (1-alpha) * g[n-1,]
+#   }
+  g = colMeans(w)
+  #g = g[Fs:nrow(g), ] # ignore beggining
+  #gg = colMeans(g)
+  w = w - g
   
+#   c = 0.1/15 # cutoff as percentage of Nyquist
+#   n = 2
+#   b = butter(n, c, type="low")
+#   gg1 = as.matrix(filter(b, w[,1]))
+#   gg2 = as.matrix(filter(b, w[,2]))
+#   gg3 = as.matrix(filter(b, w[,3]))
+#   gg = cbind(gg1, gg2, gg3)
+#   w = w - gg
+#   
   # v = vector magnitude
   v = sqrt(rowSums(w ^ 2))
   fMean = mean(v)
@@ -67,9 +79,13 @@ computeOneAccFeat = function(w, Fs) {
   fSdPitch = sd(atan2(w[, 1],w[, 3]))
   fSdYaw = sd(atan2(w[, 2],w[, 3]))
   
-  fRollG = atan2(gg[2], gg[1])
-  fPitchG = atan2(gg[1], gg[3])
-  fYawG = atan2(gg[2], gg[3])
+  #fRollG = mean(atan2(g[, 2], g[, 1]))
+  #fPitchG = mean(atan2(g[, 1], g[, 3]))
+  #fYawG = mean(atan2(g[, 2], g[, 3]))
+
+  fRollG = atan2(g[2], g[1])
+  fPitchG = atan2(g[1], g[3])
+  fYawG = atan2(g[2], g[3])
   
   s = specgram(v, n=length(v), Fs=Fs)
   S = abs(s$S)

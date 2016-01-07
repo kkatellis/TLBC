@@ -114,7 +114,7 @@ looXvalFromFeats = function(labelDir, featDirs, saveDir, names=NULL, strat=TRUE)
     testRF(featDirs, rf, saveDir1, testNames)
     # calculate performance
     cat(testNames, "\n")
-    calcPerformance(featDirs, saveDir1, testNames)
+    calcPerformance(labelDir, saveDir1, testNames)
     
     # then apply HMM smoothing to RF outputs
     hmm = trainHMM(labelDir, rf, trainNames)

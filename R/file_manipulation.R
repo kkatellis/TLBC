@@ -13,8 +13,7 @@ loadModel = function(modelName, which) {
     # if the model is a path to file, load it
     load(modelName)
   } else {
-    # otherwise look in package data
-    data(list=modelName, package="classifyBehaviors", envir = environment())
+    stop("Couldn't find model file")
   }
   if (which=="winSize") {
     return(winSize)
@@ -22,6 +21,8 @@ loadModel = function(modelName, which) {
     return(rf)
   } else if (which=="hmm") {
     return(hmm)
+  } else {
+    stop("Unknown model return type")
   }
 }
 loadData = function(labelDir, featDirs, names=NULL) {
