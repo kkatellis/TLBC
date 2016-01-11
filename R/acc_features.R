@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## functions to compute accelerometer features
 
 computeOneAccFeat = function(w, Fs) {
