@@ -150,7 +150,11 @@ extractAccFeatsFile = function(inputFile, outputPath, winSize) {
   }
   cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
   
-  while (length(line <- readLines(con, n = Fs * winSize)) >= Fs * winSize) {
+  while (is.na(suppressWarnings(as.numeric(strsplit(line <-readLines(con, n=1), ",")[[1]][1]))))
+    lines <- readLines(con, n = Fs * winSize - 1)
+  line = c(line, lines)
+  notDone = TRUE
+  while (notDone) {
     line = gsub("\"", "", line)
     M = as.matrix(strsplit(line, " "))
     M = sapply(M, strsplit, ",")
@@ -168,6 +172,8 @@ extractAccFeatsFile = function(inputFile, outputPath, winSize) {
       cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
       day = st$mday
     }
+    line <- readLines(con, n = Fs * winSize)
+    if (length(line) < Fs * winSize) notDone = FALSE
   }
   close(con)
 }

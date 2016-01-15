@@ -1,7 +1,7 @@
 Package: TLBC
 Type: Package
 Title: Two-level Behavior Classification
-Version: 1.0
+Version: 1.1
 Date: 2015-10-08
 Author: Katherine Ellis
 Maintainer: Katherine Ellis <kellis@ucsd.edu>
