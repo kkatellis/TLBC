@@ -1,18 +1,26 @@
-## functions to load and save data & other extras
+## helper functions to load and save data & other extras
 
 loadModel = function(modelName, which) {
-  # function to load a model
+  # function to load a model (and important model information)
+  # INPUTS
+  # modelName: path to a saved model OR the model itself (list structure in R)
+  # which: string that tells what kind of information to return
+  
   hmm = NULL
   rf = NULL
   winSize = NULL
   
+  # check if it's a path or the model itself
   if (typeof(modelName) == "list") {
+    # it's the model itself - return it
     return(modelName)
   }
+  # otherwise it's a path
   if (file.exists(modelName)) {
     # if the model is a path to file, load it
     load(modelName)
   } else {
+    # file doesn't exist - error
     stop("Couldn't find model file")
   }
   if (which=="winSize") {

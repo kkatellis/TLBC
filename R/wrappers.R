@@ -1,11 +1,25 @@
-## wrapper functions
+## wrapper functions - these are the main functions that you will use to train a model, apply a model, and do cross-validation
 
 trainModel = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60, 
                       modelName, names=NULL, strat=TRUE,
                       ntree=500, mtry=NULL, replace=TRUE, 
                       nsample=10000, nodesize=1, sampsize=10000) {
   # function to train a model - either from raw data or from pre-computed features
-
+  # INPUTS
+  # annotations: path to directory containing annotation files
+  # accelerometers: path to directory containing raw accelerometer files
+  # GPS: path to directory containing GPS files
+  # winSize: window size, in seconds (default is 60)
+  # modelName: path to where you want to save the model (e.g. "~/myModel.RData")
+  # names: (optional) only use these participants to train the model
+  # strat: Boolean - use stratified sampling in the random forest - choose equal amounts of each activity type when you're training (default is TRUE)
+  # ntree: number of trees in the random forest (default is 500)
+  # mtry: number of variables randomly sampled as candidates at each split in a tree (default is square root of the number of features)
+  # replace: Should sampling of cases be done with or without replacement? (default is TRUE)
+  # nsample: number of data samples to choose BEFORE you train the random forest
+  # sampsize: random forest sampling parameter: size of sample to draw
+  # nodesize: minimum size of terminal nodes (default=1)
+  
   # annotations
   labelDir = annotationsToLabels(annotations, winSize, names)
 
@@ -21,15 +35,23 @@ trainModel = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60,
 }
 classify = function(accelerometers=NULL, GPS=NULL, modelName, saveDir, names=NULL) {
   # function to classify data - either from raw data or from pre-computed features
+  # INPUTS
+  # accelerometers: path to a directory containing raw acelerometer files (if NULL, you should give it GPS)
+  # GPS: path to a directory containing GPS files (if NULL, you should give it accelerometers)
+  # modelName: path to a pre-trained model (.Rdata format)
+  # saveDir: path to a directory where you want the output saved
+  # names: (optional) if provided, only process these identifiers
   
+  # look up the window size from the model
   winSize = loadModel(modelName, "winSize")
   
-  # features
+  # compute features from raw data - return path to where features are saved
   featDirs = sensorsToFeatures(accelerometers, GPS, winSize, names)
+  # check that feature extraction step worked
   if (length(featDirs) == 0) { stop("No data directories found") }
   
   cat("\n")
-  # test
+  # do classification
   testAllDir(featDirs, modelName, saveDir, names)
 }
 looXval = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60, 

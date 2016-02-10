@@ -18,6 +18,9 @@ strat=TRUE, ntree=500, mtry=NULL, replace=TRUE, nsample=10000, nodesize=1, samps
 Path to a file containing bout-level annotations (or directory of files containing bout-level annotations). Should be csv format with fields: \emph{identifier,StartDateTime,EndDateTime,behavior}.
 
 Or, path to a directory containing instance-level annotations, \emph{i.e.}, created by the function \emph{annotationsToLabels}.
+
+Date time format should be: yyyy-mm-dd HH:MM:SS (24-hour clock).
+
 }
   \item{accelerometers}{
 (Optional) Path to a directory (or list of directories) containing actigraph accelerometer data files. Accelerometer data files should be csv files output in "raw" format by ActiLife (without timestamps), and named by the participant identifier, \emph{e.g.}, Participant01.csv.
