@@ -5,7 +5,7 @@ trainModel = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60,
                       ntree=500, mtry=NULL, replace=TRUE, 
                       nsample=10000, nodesize=1, sampsize=10000) {
   # function to train a model - either from raw data or from pre-computed features
-  # INPUTS
+  # INPUTS:
   # annotations: path to directory containing annotation files
   # accelerometers: path to directory containing raw accelerometer files
   # GPS: path to directory containing GPS files
@@ -20,16 +20,17 @@ trainModel = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60,
   # sampsize: random forest sampling parameter: size of sample to draw
   # nodesize: minimum size of terminal nodes (default=1)
   
-  # annotations
+  # convert annotations from bout-format to windows
   labelDir = annotationsToLabels(annotations, winSize, names)
 
-  # features
+  # extract features from sensor data
   featDirs = sensorsToFeatures(accelerometers, GPS, winSize, names)
-  if (length(featDirs) == 0) { stop("no data directories found") }
+  if (length(featDirs) == 0) { stop("there was a problem extracting features") }
     
-  #train
+  # train the model
   cat("\ntraining model from", length(featDirs), "devices\n")
-  trainFromFeatures(labelDir, featDirs, modelName=modelName, winSize=winSize, 
+  # train the model from features
+  trainFromFeatures(labelDir, featDirs, winSize=winSize, modelName=modelName, 
               names=names, strat=strat, ntree=ntree, mtry=mtry, replace=replace,
               nsample=nsample, nodesize=nodesize, sampsize=sampsize)
 }
@@ -67,45 +68,66 @@ looXval = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60,
   looXvalFromFeats(labelDir, featDirs, saveDir, names, strat)
 }
 sensorsToFeatures = function(accelerometers=NULL, GPS=NULL, winSize, names=NULL) {
-  # get feature directories from raw sensor directories
+  # extract features (if they don't already exist) and return feature directories from raw sensor directories
+  # INPUTS:
+  # accelerometers: path to directory containing raw accelerometer files
+  # GPS: path to directory containing GPS files
+  # winSize: window size, in seconds (default is 60)
+  # names: (optional) extract features from these participants
   
+  # intialization
   featDirs = character(0)
   
-  # GPS
-  if (!is.null(GPS)) {
+  # do GPS features
+  if (!is.null(GPS)) { # check if there are GPS features to compute
     if (!file.exists(GPS)) {
+      # the GPS path doesn't exist
       stop("GPS file/directory not found")
     }
     if (file.info(GPS)$isdir) {
+      # the GPS path (i.e., GPS) is a directory
       if (isFeatureDirectory(GPS)) {
+        # checks if the path is already to the feature directory
         GPSFeatDir = GPS
       } else {
+        # set up the feature directory name: GPS_Features_(winSize)
         GPSFeatDir = paste(GPS, "Features", as.character(winSize), sep="_")
+        # extract GPS features from a directory
         extractFeatsPALMSDir(GPS, GPSFeatDir, winSize, names)
       }
     } else {
+      # the GPS path (i.e., GPS) is a file
+      # set up the feature directory name: GPS_Features_(winSize)
       GPSFeatDir = paste(file_path_sans_ext(GPS), "Features", as.character(winSize), 
                          sep="_")
+      # extract GPS features from a single file
       extractFeatsPALMSOneFile(GPS, GPSFeatDir, winSize)
     }
+    # add the GPS feature directory to the list of feature directories
     featDirs = c(featDirs, GPSFeatDir)
   }
   
-  # accelerometers
-  if (!is.null(accelerometers)) {
-    for (acc in accelerometers) {
+  # do accelerometers features
+  if (!is.null(accelerometers)) { # check if there are GPS features to compute
+    for (acc in accelerometers) { # loop through accelerometers (e.g., wrist, hip)
       if (!file.exists(acc)) {
+        # the accelerometer path doesn't exist
         stop("accelerometer directory not found")
       }
       if (isFeatureDirectory(acc)) {
+        # checks if the path is already to the feature directory
         accFeatDir = acc
       } else {
+        # set up the feature directory name: acc_Features_(winSize)
         accFeatDir = paste(acc, "Features", as.character(winSize), sep="_")
+        # extract accelerometer features from a directory
         extractAccelerometerFeatures(acc, accFeatDir, winSize, names)
       }
+      # add the accelerometer feature directory to the list of feature directories
       featDirs = c(featDirs, accFeatDir)
     }
   }
+  # return the list of feature directories
   return(featDirs)
 }
 isFeatureDirectory = function(dir) {
@@ -154,19 +176,39 @@ looXvalFromFeats = function(labelDir, featDirs, saveDir, names=NULL, strat=TRUE)
   calcPerformance(labelDir, saveDir, names)
   cat("----------------------------------\n")
 }
-trainFromFeatures = function(labelDir, featDirs, modelName, winSize, names=NULL, 
+trainFromFeatures = function(labelDir, featDirs, winSize, modelName, names=NULL, 
                        strat=TRUE, ntree=500, mtry=NULL, sampsize=10000,
                        replace=TRUE, nsample=10000, nodesize=1) {
+  # function to train a model from pre-computed features
+  # INPUTS:
+  # labelDir: path to directory containing label files (in window format)
+  # featDirs: path to list of feature directories
+  # winSize: window size, in seconds (default is 60)
+  # modelName: path to where you want to save the model (e.g. "~/myModel.RData")
+  # names: (optional) only use these participants to train the model
+  # strat: Boolean - use stratified sampling in the random forest - choose equal amounts of each activity type when you're training (default is TRUE)
+  # ntree: number of trees in the random forest (default is 500)
+  # mtry: number of variables randomly sampled as candidates at each split in a tree (default is square root of the number of features)
+  # replace: Should sampling of cases be done with or without replacement? (default is TRUE)
+  # nsample: number of data samples to choose BEFORE you train the random forest
+  # sampsize: random forest sampling parameter: size of sample to draw
+  # nodesize: minimum size of terminal nodes (default=1)
+  
   if (is.null(names)) {
+    # if no participant names are provided, use all the names in the label directory
     names = list.files(labelDir)
   }
+  # train the random forest
   rf = trainRF(labelDir, featDirs, names=names, strat=strat, ntree=ntree, 
                mtry=mtry, replace=replace, nsample=nsample, nodesize=nodesize,
                sampsize=sampsize)
+  # train the HMM
   hmm = trainHMM(labelDir, rf, names)
+  # create the directory in which to save the model (if it doesn't exist)
   if (!file.exists(dirname(modelName))){
     dir.create(dirname(modelName), recursive=TRUE)
   }
+  # save the trained model
   save(rf, hmm, winSize, file=modelName)
   cat("model saved to", modelName, "\n")
 }
