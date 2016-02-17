@@ -1,4 +1,4 @@
-## wrapper functions - these are the main functions that you will use to train a model, apply a model, and do cross-validation
+## wrapper functions - these are the main functions that you will use to train a model, classify data using a pre-trained model, and do cross-validation
 
 trainModel = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60, 
                       modelName, names=NULL, strat=TRUE,

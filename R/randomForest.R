@@ -25,16 +25,27 @@ trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE,
   cat("using labels: ", unique(labels), "\n")
   
   if (!is.null(nsample)){
+    # check that nsample is not larger than amount of training data
     nsample = min(nrow(trainDat), nsample)
-  } else { nsample = nrow(trainDat) }
+  } else { 
+    # default value
+    nsample = nrow(trainDat) 
+  }
   if (strat) {
+    # do stratified sampling
+    # get number of samples per class
     nstrat = round(nsample / length(unique(labels)))
     s = stratSample(labels, nstrat)
   } else {
     s = sample(nrow(trainDat), nsample)
   }
+  # check that sampsize is not larger than amount of training data
   sampsize = min(length(s), sampsize)
-  if (is.null(mtry)) { mtry = floor(sqrt(ncol(trainDat))) }
+  if (is.null(mtry)) { 
+    # set up default value
+    mtry = floor(sqrt(ncol(trainDat)))
+  }
+  # train the random forest using the randomForest package
   rf = randomForest(trainDat[s, ], factor(labels[s]),
                     ntree=ntree,
                     mtry=mtry,
@@ -42,6 +53,7 @@ trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE,
                     sampsize=sampsize,
                     nodesize=nodesize,
                     importance=TRUE)
+  # add pre-processing values and ground truth to the object for saving
   rf$preProcValues = preProcValues
   rf$groundTruth = labels[s]
   return(rf)
@@ -161,6 +173,7 @@ testTwoRFs = function(featDirs1, featDirs2, rf1, rf2, saveDir, testNames){
   }
 }
 stratSample = function(labels, nsamp) {
+  # do stratified sampling
   t = table(labels)
   lmat = data.frame(label=labels)
   lmat$idx = as.numeric(rownames(lmat))
