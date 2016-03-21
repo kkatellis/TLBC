@@ -12,7 +12,16 @@ computeOneAccFeat = function(w, Fs) {
 #     g = 0.9 * g + 0.1 * w[n, ]
 #   }
   
-#   g = matrix(0, nrow(w), 3)
+    g = matrix(0, nrow(w), 3)
+    x = 0.9
+    g[1, ] = (1-x) * w[1, ]
+    for (n in 2:nrow(w)) {
+      g[n, ] = x * g[n-1] + (1-x) * w[n, ]
+    }
+    g = g[Fs:nrow(g), ] # ignore beggining
+    gg = colMeans(g)
+    w = w - gg
+
 #   alpha = 0.06
 #   deltaT = 1/30
 #   fc = alpha/((1 - alpha) * 2 * pi * deltaT) # cutoff frequency
@@ -20,10 +29,10 @@ computeOneAccFeat = function(w, Fs) {
 #   for (n in 2:nrow(w)) {
 #     g[n, ] = alpha * w[n, ] + (1-alpha) * g[n-1,]
 #   }
-  g = colMeans(w)
+  #g = colMeans(w)
   #g = g[Fs:nrow(g), ] # ignore beggining
   #gg = colMeans(g)
-  w = w - g
+  #w = w - g
   
 #   c = 0.1/15 # cutoff as percentage of Nyquist
 #   n = 2
@@ -129,18 +138,18 @@ extractAccFeatsFile = function(inputFile, outputPath, winSize) {
   # function to extract accelerometer features from raw actigraph file
   
   con = file(inputFile, open = "r")
-  line = readLines(con, n = 1)
-  Fs = as.numeric(str_match(line, "(\\d+) Hz")[1, 2])
-  dateFmt = str_match(line, "date format ([a-z,A-Z,/]*)")[1, 2]
+  line1 = readLines(con, n = 1)
+  Fs = as.numeric(str_match(line1, "(\\d+) Hz")[1, 2])
+  dateFmt = str_match(line1, "date format ([a-z,A-Z,/]*)")[1, 2]
   dateFmt = gsub("yyyy", "%Y", dateFmt)
   dateFmt = gsub("M", "%m", dateFmt)
   dateFmt = gsub("d", "%d", dateFmt)
-  line = readLines(con, n = 1)
-  line = readLines(con, n = 1)
-  StartTime = gsub("Start Time ", "", line)
-  line = readLines(con, n = 1)
-  StartDate = gsub("Start Date ", "", line)
-  line = readLines(con, n = 6)
+  line1 = readLines(con, n = 1)
+  line1 = readLines(con, n = 1)
+  StartTime = gsub("Start Time ", "", line1)
+  line1 = readLines(con, n = 1)
+  StartDate = gsub("Start Date ", "", line1)
+  line1 = readLines(con, n = 6)
   st = strptime(paste(StartDate, StartTime), paste(dateFmt, "%H:%M:%S"))
   day = st$mday
   out = file.path(outputPath,strftime(st, "%Y-%m-%d"))
@@ -149,14 +158,14 @@ extractAccFeatsFile = function(inputFile, outputPath, winSize) {
     dir.create(outputPath, recursive=TRUE)
   }
   cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
+  while (is.na(suppressWarnings(as.numeric(strsplit(line1 <-readLines(con, n=1), ",")[[1]][1])))){}
   
-  while (is.na(suppressWarnings(as.numeric(strsplit(line <-readLines(con, n=1), ",")[[1]][1]))))
-    lines <- readLines(con, n = Fs * winSize - 1)
-  line = c(line, lines)
+  lines1 <- readLines(con, n = Fs * winSize - 1)
+  line1 = c(line1, lines1)
   notDone = TRUE
   while (notDone) {
-    line = gsub("\"", "", line)
-    M = as.matrix(strsplit(line, " "))
+    line1 = gsub("\"", "", line1)
+    M = as.matrix(strsplit(line1, " "))
     M = sapply(M, strsplit, ",")
     M = sapply(M, as.numeric)
     M = t(M)
@@ -172,8 +181,8 @@ extractAccFeatsFile = function(inputFile, outputPath, winSize) {
       cat("timestamp,mean,sd,coefvariation,median,min,max,25thp,75thp,autocorr,corrxy,corrxz,corryz,avgroll,avgpitch,avgyaw,sdroll,sdpitch,sdyaw,rollg,pitchg,yawg,fmax,pmax,fmaxband,pmaxband,entropy,fft0,fft1,fft2,fft3,fft4,fft5,fft6,fft7,fft8,fft9,fft10,fft11,fft12,fft13,fft14\n", file=out, append=TRUE)
       day = st$mday
     }
-    line <- readLines(con, n = Fs * winSize)
-    if (length(line) < Fs * winSize) notDone = FALSE
+    line1 <- readLines(con, n = Fs * winSize)
+    if (length(line1) < Fs * winSize) notDone = FALSE
   }
   close(con)
 }
