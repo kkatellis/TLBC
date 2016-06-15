@@ -56,16 +56,42 @@ classify = function(accelerometers=NULL, GPS=NULL, modelName, saveDir, names=NUL
   testAllDir(featDirs, modelName, saveDir, names)
 }
 looXval = function(annotations, accelerometers=NULL, GPS=NULL, winSize=60, 
-                   saveDir, names=NULL, strat=TRUE) {
-  # annotations
-  labelDir = annotationsToLabels(annotations, winSize, names)
-  # features
-  featDirs = sensorsToFeatures(accelerometers, GPS, winSize, names)
-  if (length(featDirs) == 0) { stop("no data directories found") }
+                   saveDir, names=NULL, strat=TRUE,
+                   ntree=500, mtry=NULL, replace=TRUE, 
+                   nsample=10000, nodesize=1, sampsize=10000) {
     
-  #train
-  cat("cross-validating model from", length(featDirs), "devices\n")
-  looXvalFromFeats(labelDir, featDirs, saveDir, names, strat)
+  # function to do leave-one-participant-out cross-validation
+  # INPUTS:
+  # annotations: path to directory containing annotation files
+  # accelerometers: path to directory containing raw accelerometer files
+  # GPS: path to directory containing GPS files
+  # winSize: window size, in seconds (default is 60)
+  # saveDir: path to directory where predictions will be saved
+  # names: (optional) only use these participants to train the model
+  # strat: Boolean - use stratified sampling in the random forest - choose equal amounts of each activity type when you're training (default is TRUE)
+  # ntree: number of trees in the random forest (default is 500)
+  # mtry: number of variables randomly sampled as candidates at each split in a tree (default is square root of the number of features)
+  # replace: Should sampling of cases be done with or without replacement? (default is TRUE)
+  # nsample: number of data samples to choose BEFORE you train the random forest
+  # sampsize: random forest sampling parameter: size of sample to draw
+  # nodesize: minimum size of terminal nodes (default=1)
+  if (is.null(names)){
+    names = list.files(annotations)
+  }
+  for (i in length(names)){
+    testName = names[i]
+    trainNames = names[-i]
+    sprintf("Cross-validating participant %s", testName)
+    modelName = file.path(saveDir, "xvalModelTemp.Rdata")
+    # first train the model
+    trainModel(annotations=annotations, accelerometers=accelerometers, GPS=GPS, winSize=winSize, 
+             modelName=modelName, names=trainNames, strat=strat, ntree=ntree,
+             mtry=mtry, replace=replace, nsample=nsample, nodesize=nodesize, sampsize=sampsize)
+    # then test the model
+    classify(accelerometers=accelerometers, GPS=GPS, modelName=modelName, saveDir=saveDir, names=testName)
+    # delete the temporary model file
+    file.remove(modelName)
+  }
 }
 sensorsToFeatures = function(accelerometers=NULL, GPS=NULL, winSize, names=NULL) {
   # extract features (if they don't already exist) and return feature directories from raw sensor directories
@@ -139,43 +165,6 @@ isFeatureDirectory = function(dir) {
     return (FALSE)
   }
 }
-looXvalFromFeats = function(labelDir, featDirs, saveDir, names=NULL, strat=TRUE) {
-  saveDir1 = paste(saveDir, "Temp", sep="")
-  if (is.null(names)) {
-    names = list.files(labelDir)
-  }
-  for (i in 1:length(names)) {
-    cat("test subject:", names[i], "\n")
-    testNames = names[i]
-    trainNames = names[-i]
-
-    # do two-level classification
-    modelName1 = "temp.rf"
-    modelName2 = "temp.hmm"
-    
-    # first train RF
-    rf = trainRF(labelDir, featDirs, trainNames, strat=strat)
-    testRF(featDirs, rf, saveDir1, testNames)
-    # calculate performance
-    cat(testNames, "\n")
-    calcPerformance(labelDir, saveDir1, testNames)
-    
-    # then apply HMM smoothing to RF outputs
-    hmm = trainHMM(labelDir, rf, trainNames)
-    testHMM(saveDir1, hmm, saveDir, testNames)
-    # calculate performance
-    cat(testNames,"\n")
-    calcPerformance(labelDir, saveDir, testNames)
-    file.remove(modelName1)
-    file.remove(modelName2)
-    cat("----------------------------------\n")
-  }
-  cat("Overall RF\n")
-  calcPerformance(labelDir, saveDir1, names)
-  cat("Overall HMM\n")
-  calcPerformance(labelDir, saveDir, names)
-  cat("----------------------------------\n")
-}
 trainFromFeatures = function(labelDir, featDirs, winSize, modelName, names=NULL, 
                        strat=TRUE, ntree=500, mtry=NULL, sampsize=10000,
                        replace=TRUE, nsample=10000, nodesize=1) {
@@ -213,10 +202,18 @@ trainFromFeatures = function(labelDir, featDirs, winSize, modelName, names=NULL,
   cat("model saved to", modelName, "\n")
 }
 testAllDir = function(featDirs, modelName, saveDir, names=NULL) {
+  # function to classify test data from features
+  # INPUTS: 
+  # featDirs: path to list of feature directories
+  # modelName: path to saved model that will be applied
+  # saveDir: path to a directory where you want the output saved
+  # names: (optional) if provided, only process these identifiers
+  
   if (is.null(names)) {
     names = list.files(featDirs[1])
   }
-  saveDir1 = file.path(saveDir, "Temp")
+  # saveDir1 is directory where unsmoothed predictions are saved
+  saveDir1 = file.path(saveDir, "Level1")
   for (i in 1:length(names)) {
     testRF(featDirs, modelName, saveDir1, names[i])
     testHMM(saveDir1, modelName, saveDir, names[i])

@@ -1,6 +1,7 @@
 ## functions to train and test random forest
 
-trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE, 
+trainRF = function(labelDir, featDirs, names=NULL, featNames=NULL, combineStanding=FALSE, 
+                   strat=TRUE, 
                    ntree=500, mtry=NULL, replace=TRUE,
                    nsample=10000, nodesize=1, sampsize=10000) {
   # function to train a random forest
@@ -10,6 +11,20 @@ trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE,
   trainDat = train[[2]]
   trainDat$timestamp = NULL
   trainDat$PtID = NULL
+  
+  # get features
+  if (!is.null(featNames)) {
+    if (length(featNames) < 1) {
+      stop("featNames is empty")
+    }
+    if (length(featNames) == 1) {
+      x = featNames
+      trainDat = data.frame(x=trainDat[,featNames])
+    } else {
+      trainDat = trainDat[,featNames]
+    }
+    cat("reduced to", ncol(trainDat), "features")
+  }
   
   # pre-process - center and scale features
   cat("pre-processing\n")
@@ -58,7 +73,7 @@ trainRF = function(labelDir, featDirs, names, combineStanding=FALSE, strat=TRUE,
   rf$groundTruth = labels[s]
   return(rf)
 }
-testRF = function(featDirs, modelName, saveDir, testNames){
+testRF = function(featDirs, modelName, saveDir, testNames, featNames=NULL){
   # load model
   rf = loadModel(modelName, "rf")
   
@@ -76,6 +91,20 @@ testRF = function(featDirs, modelName, saveDir, testNames){
     # remove timestamps
     timestamps = testDat$timestamp
     testDat$timestamp = NULL
+    
+    # get features
+    if (!is.null(featNames)) {
+      if (length(featNames) < 1) {
+        stop("featNames is empty")
+      }
+      if (length(featNames) == 1) {
+        x = featNames
+        testDat = data.frame(x=testDat[,featNames])
+      } else {
+        testDat = testDat[,featNames]
+      }
+      cat("reduced to", ncol(testDat), "features")
+    }
     
     # pre-process - center and scale features
     cat("pre-processing\n")
