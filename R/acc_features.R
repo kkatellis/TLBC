@@ -18,10 +18,9 @@ computeOneAccFeat = function(w, Fs) {
     for (n in 2:nrow(w)) {
       g[n, ] = x * g[n-1,] + (1-x) * w[n, ]
     }
-    g = g[Fs:nrow(g), ] # ignore beggining
+    g = g[Fs:nrow(g), ] # ignore start
     gg = colMeans(g)
-    #w = w - gg
-    w = t(apply(w,1,function(x) x-gg))
+    w =  sweep(w, 2, gg, FUN='-')
 
   # compute the vector magnitude
   v = sqrt(rowSums(w ^ 2))
@@ -47,8 +46,8 @@ computeOneAccFeat = function(w, Fs) {
   f75thP = quantile(v, 0.75)[[1]]
   
   # autocorrelation
-  a = acf(v, plot=FALSE)
-  fAutocorr = which.max(abs(a$acf[2:length(a$acf)])) / (nrow(w) / Fs)
+  a = acf(v, plot=FALSE, lag.max = Fs * 10)
+  fAutocorr = which.max(abs(a$acf[2:length(a$acf)])) / Fs
   
   # correlation between axes
   if ((sd(w[, 3]) > 0) & (sd(w[, 2]) > 0)) {
